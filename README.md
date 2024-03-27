@@ -1,6 +1,4 @@
-Certainly! Here's the complete README.md content merged into a single block:
 
-```markdown
 # Employee Management App
 
 Employee Management App is a Flutter application that allows you to manage employees' data. It provides functionality to add new employees, view the list of employees, and delete employees.
