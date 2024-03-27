@@ -8,3 +8,10 @@ String? isValidName(value) {
   }
   return null;
 }
+
+String? isValidDate(value) {
+  if (value == null || value.isEmpty) {
+    return 'Please Select Date';
+  }
+  return null;
+}

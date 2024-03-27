@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CustomDatePicker extends StatelessWidget {
-  CustomDatePicker({
+  const CustomDatePicker({
     Key? key,
     required this.hint,
     required this.label,

@@ -12,6 +12,8 @@ class AddEmployeeScreen extends StatefulWidget {
 }
 
 class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
+  final _formKey = GlobalKey<FormState>();
+
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
 
@@ -26,59 +28,76 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CustomTextFormField(
-              validator: isValidName,
-              controller: _nameController,
-              hint: 'First Last',
-              label: 'Full Name',
-              icon: Icons.person,
-            ),
-            const SizedBox(height: 20.0),
-            CustomDatePicker(
-              controller: _dateController,
-              icon: Icons.calendar_month,
-              hint: 'DD/MM/YYY',
-              label: 'Joining date',
-            ),
-            const SizedBox(height: 10.0),
-            SwitchListTile(
-              title: const Text('Active'),
-              value: isActive,
-              onChanged: (value) {
-                setState(() {
-                  isActive = value;
-                });
-              },
-            ),
-            const Spacer(),
-            SizedBox(
-              height: 52,
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  startDate =
-                      DateFormat('dd/MM/yyyy').parse(_dateController.text);
-                  // Add employee to Firestore
-
-                  FirebaseFirestore.instance.collection('employees').add({
-                    'name': _nameController.text,
-                    'startDate': startDate,
-                    'isActive': isActive,
-                  });
-
-                  // Navigate back to the employee screen
-                  Navigator.pop(context);
-                },
-                child: const Text('Add Employee'),
-                style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4))),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CustomTextFormField(
+                validator: isValidName,
+                controller: _nameController,
+                hint: 'First Last',
+                label: 'Full Name',
+                icon: Icons.person,
               ),
-            ),
-          ],
+              const SizedBox(height: 20.0),
+              CustomDatePicker(
+                validator: isValidDate,
+                controller: _dateController,
+                icon: Icons.calendar_month,
+                hint: 'DD/MM/YYY',
+                label: 'Joining date',
+              ),
+              const SizedBox(height: 10.0),
+              SwitchListTile(
+                title: const Text('Active'),
+                value: isActive,
+                onChanged: (value) {
+                  setState(() {
+                    isActive = value;
+                  });
+                },
+              ),
+              const Spacer(),
+              SizedBox(
+                height: 52,
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      _formKey.currentState!.save();
+                      startDate =
+                          DateFormat('dd/MM/yyyy').parse(_dateController.text);
+                      // Add employee to Firestore
+                      FirebaseFirestore.instance.collection('employees').add({
+                        'name': _nameController.text,
+                        'startDate': startDate,
+                        'isActive': isActive,
+                      });
+
+                      // Navigate back to the employee screen
+                      Navigator.pop(context);
+                    }
+                    // startDate =
+                    //     DateFormat('dd/MM/yyyy').parse(_dateController.text);
+                    // // Add employee to Firestore
+                    // FirebaseFirestore.instance.collection('employees').add({
+                    //   'name': _nameController.text,
+                    //   'startDate': startDate,
+                    //   'isActive': isActive,
+                    // });
+
+                    // // Navigate back to the employee screen
+                    // Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4))),
+                  child: const Text('Add Employee'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

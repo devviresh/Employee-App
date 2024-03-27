@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:employee_app/screens/add_employee.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../model/employee.dart';
+import '../widgets/employee_card.dart';
 
 class EmployeeScreen extends StatelessWidget {
   const EmployeeScreen({
@@ -15,7 +16,16 @@ class EmployeeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        leading: const Icon(Icons.home),
+        leading: Icon(Icons.deblur),
+        actions: [
+          IconButton(
+              onPressed: () async {
+                await launchUrl(Uri.parse(
+                  "https://vireshdev.netlify.app",
+                ));
+              },
+              icon: const Icon(Icons.info_outline)),
+        ],
         title: const Text('Employees'),
       ),
       body: StreamBuilder(
@@ -45,13 +55,33 @@ class EmployeeScreen extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                 child: EmployeeCard(
-                    employee: employee,
-                    flagGreen: flagGreen,
-                    document: document),
+                  employee: employee,
+                  flagGreen: flagGreen,
+                  id: document.id,
+                ),
               );
             },
           );
         },
+      ),
+      bottomSheet: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            const InfoWidget(
+              color: Colors.white,
+              text: 'Active',
+            ),
+            InfoWidget(
+              color: Colors.grey[200]!,
+              text: 'Inactive',
+            ),
+            const InfoWidget(
+              color: Colors.greenAccent,
+              text: 'Staff',
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -66,45 +96,39 @@ class EmployeeScreen extends StatelessWidget {
   }
 }
 
-class EmployeeCard extends StatelessWidget {
-  const EmployeeCard({
+class InfoWidget extends StatelessWidget {
+  const InfoWidget({
     super.key,
-    required this.employee,
-    required this.flagGreen,
-    required this.document,
+    required this.color,
+    required this.text,
   });
 
-  final Employee employee;
-  final bool flagGreen;
-  final DocumentSnapshot<Object?> document;
+  final Color color;
+  final String text;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      child: ListTile(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        leading: Icon(employee.isActive ? Icons.person_2 : Icons.person_off),
-        title: Text(employee.name),
-        subtitle: Text(
-            'From: ${DateFormat('dd MMM, yyyy').format(employee.startDate)}'),
-        tileColor: flagGreen
-            ? Colors.greenAccent
-            : employee.isActive
-                ? Colors.white
-                : Colors.grey[200],
-        trailing: IconButton(
-          onPressed: () {
-            FirebaseFirestore.instance
-                .collection('employees')
-                .doc(document.id)
-                .delete();
-          },
-          icon: const Icon(
-            Icons.delete,
-            color: Colors.red,
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Row(
+        children: [
+          Container(
+            height: 25,
+            width: 25,
+            decoration: BoxDecoration(boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 1,
+                blurRadius: 2,
+                offset: Offset(1, 1),
+              ),
+            ], borderRadius: BorderRadius.circular(5), color: color),
           ),
-        ),
+          const SizedBox(
+            width: 5,
+          ),
+          Text(text)
+        ],
       ),
     );
   }
