@@ -1,10 +1,14 @@
 class Employee {
+  final String id;
   final String name;
   final DateTime startDate;
   final bool isActive;
 
   Employee(
-      {required this.name, required this.startDate, required this.isActive});
+      {required this.id,
+      required this.name,
+      required this.startDate,
+      required this.isActive});
 
   bool isGreenFlag() {
     DateTime now = DateTime.now();

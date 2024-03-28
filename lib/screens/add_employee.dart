@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:employee_app/model/employee.dart';
 import 'package:employee_app/widgets/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -7,6 +8,9 @@ import '../widgets/custom_date_picker.dart';
 import '../widgets/custom_text_form_field.dart';
 
 class AddEmployeeScreen extends StatefulWidget {
+  final Employee? employee;
+  const AddEmployeeScreen({Key? key, this.employee}) : super(key: key);
+
   @override
   _AddEmployeeScreenState createState() => _AddEmployeeScreenState();
 }
@@ -16,9 +20,19 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
-
   DateTime startDate = DateTime.now();
   bool isActive = true;
+
+  @override
+  void initState() {
+    if (widget.employee != null) {
+      _nameController.text = widget.employee!.name;
+      _dateController.text =
+          '${widget.employee!.startDate.day}/${widget.employee!.startDate.month}/${widget.employee!.startDate.year}';
+      isActive = widget.employee!.isActive;
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,11 +83,22 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                       startDate =
                           DateFormat('dd/MM/yyyy').parse(_dateController.text);
                       // Add employee to Firestore
-                      FirebaseFirestore.instance.collection('employees').add({
-                        'name': _nameController.text,
-                        'startDate': startDate,
-                        'isActive': isActive,
-                      });
+                      if (widget.employee != null) {
+                        FirebaseFirestore.instance
+                            .collection('employees')
+                            .doc(widget.employee!.id)
+                            .update({
+                          'name': _nameController.text,
+                          'startDate': startDate,
+                          'isActive': isActive,
+                        });
+                      } else {
+                        FirebaseFirestore.instance.collection('employees').add({
+                          'name': _nameController.text,
+                          'startDate': startDate,
+                          'isActive': isActive,
+                        });
+                      }
 
                       // Navigate back to the employee screen
                       Navigator.pop(context);
@@ -93,7 +118,9 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                   style: ElevatedButton.styleFrom(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(4))),
-                  child: const Text('Add Employee'),
+                  child: Text(widget.employee != null
+                      ? 'Update Employee'
+                      : 'Add Employee'),
                 ),
               ),
             ],

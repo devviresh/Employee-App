@@ -16,7 +16,7 @@ class EmployeeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        leading: Icon(Icons.deblur),
+        leading: const Icon(Icons.deblur),
         actions: [
           IconButton(
               onPressed: () async {
@@ -46,6 +46,7 @@ class EmployeeScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final DocumentSnapshot document = snapshot.data!.docs[index];
               final employee = Employee(
+                id: document.id,
                 name: document['name'],
                 startDate: (document['startDate'] as Timestamp).toDate(),
                 isActive: document['isActive'],
@@ -55,9 +56,10 @@ class EmployeeScreen extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                 child: EmployeeCard(
+                  // document: document,
                   employee: employee,
-                  flagGreen: flagGreen,
-                  id: document.id,
+                  // flagGreen: flagGreen,
+                  // id: document.id,
                 ),
               );
             },
@@ -87,7 +89,7 @@ class EmployeeScreen extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddEmployeeScreen()),
+            MaterialPageRoute(builder: (context) => const AddEmployeeScreen()),
           );
         },
         child: const Icon(Icons.add),
@@ -120,7 +122,7 @@ class InfoWidget extends StatelessWidget {
                 color: Colors.grey.withOpacity(0.5),
                 spreadRadius: 1,
                 blurRadius: 2,
-                offset: Offset(1, 1),
+                offset: const Offset(1, 1),
               ),
             ], borderRadius: BorderRadius.circular(5), color: color),
           ),
